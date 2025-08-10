@@ -50,10 +50,3 @@ Wenn Sie die Datei `index.html` öffnen, sehen Sie zuerst den Einrichtungsbildsc
 ### 3. Zurücksetzen
 
 -   Auf dem Einrichtungsbildschirm setzt die Schaltfläche **"Auf Standardwerte zurücksetzen"** alle benutzerdefinierten Daten (Teams, Kategorien, Fragen, Branding) zurück und stellt die ursprünglichen Standardwerte wieder her.
-
-## Verwendete Technologien
-
--   **HTML5**
--   **CSS3**
--   **Tailwind CSS**: Ein Utility-First-CSS-Framework für schnelle UI-Entwicklung.
--   **JavaScript (ES6+)**
