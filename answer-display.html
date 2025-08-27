@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeopardy - Antwortanzeige</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1a202c;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+        .content-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Correction Icon (Top Right) -->
+    <div id="correction-icon-container" class="absolute top-4 right-4 hidden">
+        <button id="correction-icon" class="text-gray-400 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-area">
+        <div id="answer-display" class="text-4xl font-bold">Wartet auf eine Frage...</div>
+        <div id="teams-container" class="mt-8"></div>
+    </div>
+
+    <!-- Bottom Action Buttons -->
+    <div id="action-buttons-container" class="w-full max-w-4xl mt-8"></div>
+
+    <!-- Correction Modal -->
+    <div id="correction-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4">
+        <div class="bg-gray-800 p-8 rounded-lg w-full max-w-2xl shadow-2xl">
+            <h2 class="text-3xl font-bold mb-6 text-center text-white">Punkte korrigieren</h2>
+            <div id="correction-teams-container" class="space-y-4"></div>
+            <button id="close-correction-modal-btn" class="mt-8 w-full bg-gray-500 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 hover:scale-105 hover:bg-gray-400 shadow-md text-xl">
+                Zurück
+            </button>
+        </div>
+    </div>
+
+    <script src="answer-display.js"></script>
+</body>
+</html>

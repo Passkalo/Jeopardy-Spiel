@@ -19,6 +19,8 @@ let logoSize = 80; // Default logo size in px
 
 let activeQuestion = null; // Stores the currently active question
 let board = []; // Stores the game board state during play
+let answerWindow = null; // Reference to the second window for answers
+const jeopardyChannel = new BroadcastChannel('jeopardy_channel'); // Channel for cross-window communication
 
 // HTML elements
 const setupScreen = document.getElementById('setup-screen');
@@ -57,6 +59,7 @@ document.getElementById('edit-settings-btn').addEventListener('click', () => {
     setupScreen.classList.remove('hidden');
     renderSetupScreen();
 });
+document.getElementById('open-answer-window-btn').addEventListener('click', openAnswerWindow);
 document.getElementById('add-team-btn').addEventListener('click', addTeam);
 document.getElementById('add-category-btn').addEventListener('click', addCategory);
 document.getElementById('show-answer-btn').addEventListener('click', showAnswer);
@@ -72,14 +75,37 @@ logoSettingsCollapse.addEventListener('click', toggleLogoSettings);
 saveConfigBtn.addEventListener('click', saveConfiguration);
 loadConfigInput.addEventListener('change', loadConfiguration);
 
+// Listen for messages from the answer window
+jeopardyChannel.onmessage = (event) => {
+    const { type, payload } = event.data;
+    if (type === 'AWARD_POINTS') {
+        handleScoreUpdate(payload.teamId, payload.points);
+    } else if (type === 'CLOSE_MODAL') {
+        closeModal();
+    } else if (type === 'SHOW_ANSWER_IN_MAIN_WINDOW') {
+        showAnswer();
+    }
+};
+
 // Load state from the browser on page load
 loadStateFromBrowser();
 // Initial rendering of the setup screen
 renderSetupScreen();
 
 /**
+ * Opens a new window to display the answers.
+ * If the window is already open, it focuses it.
+ */
+function openAnswerWindow() {
+    if (answerWindow && !answerWindow.closed) {
+        answerWindow.focus();
+    } else {
+        answerWindow = window.open('answer-display.html', 'JeopardyAnswerScreen', 'width=800,height=600');
+    }
+}
+
+/**
  * Saves the current game configuration to the browser's local storage.
- * This ensures the state persists when the user reloads the page.
  */
 function saveStateToBrowser() {
     try {
@@ -101,7 +127,6 @@ function saveStateToBrowser() {
 
 /**
  * Loads a previously saved game configuration from local storage.
- * If no state is found or an error occurs, default values are used.
  */
 function loadStateFromBrowser() {
     const savedState = localStorage.getItem('jeopardyConfig');
@@ -117,13 +142,12 @@ function loadStateFromBrowser() {
             logoPosition = loadedConfig.logoPosition;
             logoSize = loadedConfig.logoSize;
             
-            // Update UI input fields
             gameTitleInput.value = gameTitle;
             logoUrlInput.value = brandenburgLogoUrl;
             mainColorInput.value = mainColor;
         } catch (error) {
             console.error("Error loading state from browser:", error);
-            localStorage.removeItem('jeopardyConfig'); // Remove corrupted data
+            localStorage.removeItem('jeopardyConfig');
         }
     }
 }
@@ -131,11 +155,9 @@ function loadStateFromBrowser() {
 
 /**
  * Saves the current game configuration as a downloadable JSON file.
- * This allows users to back up or share their game setup.
  */
 function saveConfiguration() {
     const fullConfiguration = {
-        // Only save team names, scores are reset on load
         teams: teams.map(t => ({ name: t.name })), 
         gameData,
         gameTitle,
@@ -160,7 +182,6 @@ function saveConfiguration() {
 
 /**
  * Loads a game configuration from a user-selected JSON file.
- * This allows users to import a game setup.
  * @param {Event} event The file input change event.
  */
 function loadConfiguration(event) {
@@ -178,7 +199,6 @@ function loadConfiguration(event) {
             }
 
             gameData = loadedConfig.gameData;
-            // Re-create teams with new IDs and reset scores
             teams = loadedConfig.teams.map(team => ({
                 id: crypto.randomUUID(),
                 name: team.name,
@@ -197,12 +217,12 @@ function loadConfiguration(event) {
             mainColorInput.value = mainColor;
 
             renderSetupScreen();
-            saveStateToBrowser(); // Save the loaded state to the browser
+            saveStateToBrowser();
         } catch (error) {
             console.error("Error parsing JSON file:", error);
             alert('Error reading the file. Please ensure it is a valid JSON configuration file.');
         } finally {
-            event.target.value = null; // Reset file input
+            event.target.value = null;
         }
     };
     reader.readAsText(file);
@@ -218,7 +238,6 @@ function toggleLogoSettings() {
 
 /**
  * Renders the setup screen based on the current gameData and teams state.
- * This function dynamically creates the UI for editing categories, questions, and teams.
  */
 function renderSetupScreen() {
     teamsContainer.innerHTML = '';
@@ -275,16 +294,12 @@ function renderSetupScreen() {
         categoryDiv.querySelector(`button.bg-green-500`).addEventListener('click', (e) => addQuestion(parseInt(e.target.dataset.categoryIndex)));
     });
 
-    // Update UI elements for branding settings
     showLogoCheckbox.checked = showLogo;
     logoPositionSelect.value = logoPosition;
     logoSizeInput.value = logoSize;
     updateBranding();
 }
 
-/**
- * Adds a new team to the game state.
- */
 function addTeam() {
     const newTeamCount = teams.length + 1;
     const newTeam = { id: crypto.randomUUID(), name: `Team ${newTeamCount}`, score: 0 };
@@ -293,41 +308,24 @@ function addTeam() {
     saveStateToBrowser();
 }
 
-/**
- * Removes a team from the game state by its ID.
- * @param {string} id The ID of the team to remove.
- */
 function removeTeam(id) {
     teams = teams.filter(team => team.id !== id);
     renderSetupScreen();
     saveStateToBrowser();
 }
 
-/**
- * Updates a team's name.
- * @param {string} id The ID of the team.
- * @param {string} newName The new name for the team.
- */
 function updateTeamName(id, newName) {
     const team = teams.find(t => t.id === id);
     if (team) team.name = newName;
     saveStateToBrowser();
 }
 
-/**
- * Updates a category's name.
- * @param {number} index The index of the category.
- * @param {string} newName The new name for the category.
- */
 function updateCategoryName(index, newName) {
     const categoryIndex = parseInt(index);
     if (gameData.categories[categoryIndex]) gameData.categories[categoryIndex].name = newName;
     saveStateToBrowser();
 }
 
-/**
- * Adds a new, empty category to the game.
- */
 function addCategory() {
     const newCategory = { name: `Neue Kategorie ${gameData.categories.length + 1}`, questions: [] };
     gameData.categories.push(newCategory);
@@ -335,30 +333,18 @@ function addCategory() {
     saveStateToBrowser();
 }
 
-/**
- * Removes a category from the game.
- * @param {number} index The index of the category to remove.
- */
 function removeCategory(index) {
     gameData.categories.splice(index, 1);
     renderSetupScreen();
     saveStateToBrowser();
 }
 
-/**
- * Adds a new, empty question to a specific category.
- * @param {number} categoryIndex The index of the category.
- */
 function addQuestion(categoryIndex) {
     gameData.categories[categoryIndex].questions.push({ points: 0, question: "", answer: "" });
     renderSetupScreen();
     saveStateToBrowser();
 }
 
-/**
- * Updates a specific field (points, question, or answer) of a question.
- * @param {Event} e The change event from the input field.
- */
 function updateQuestion(e) {
     const categoryIndex = parseInt(e.target.dataset.categoryIndex);
     const questionIndex = parseInt(e.target.dataset.questionIndex);
@@ -369,21 +355,12 @@ function updateQuestion(e) {
     saveStateToBrowser();
 }
 
-/**
- * Removes a question from a category.
- * @param {number} categoryIndex The index of the category.
- * @param {number} questionIndex The index of the question.
- */
 function removeQuestion(categoryIndex, questionIndex) {
     gameData.categories[categoryIndex].questions.splice(questionIndex, 1);
     renderSetupScreen();
     saveStateToBrowser();
 }
 
-/**
- * Updates the visual branding of the entire application (colors, logo, etc.).
- * This is called whenever a branding setting changes.
- */
 function updateBranding() {
     gameTitleDisplay.style.color = mainColor;
     document.getElementById('setup-title').style.color = mainColor;
@@ -396,7 +373,6 @@ function updateBranding() {
     document.querySelectorAll('#game-board .text-white').forEach(title => title.style.backgroundColor = mainColor);
     document.querySelectorAll('#game-board .text-2xl').forEach(card => card.style.color = mainColor);
     
-    // Logo display logic
     logoImgDisplay.src = brandenburgLogoUrl;
     logoImgDisplay.classList.toggle('hidden', !showLogo || !brandenburgLogoUrl);
     logoImgDisplay.style.height = `${logoSize}px`;
@@ -410,71 +386,43 @@ function updateBranding() {
     else headerContainer.classList.add('items-end');
 }
 
-/**
- * Updates the game title and saves the state.
- * @param {Event} e The input event.
- */
 function updateGameTitle(e) {
     gameTitle = e.target.value;
     gameTitleDisplay.textContent = gameTitle;
     saveStateToBrowser();
 }
 
-/**
- * Updates the logo URL and re-renders the branding.
- * @param {Event} e The input event.
- */
 function updateLogoUrl(e) {
     brandenburgLogoUrl = e.target.value;
     updateBranding();
     saveStateToBrowser();
 }
 
-/**
- * Updates the main color and re-renders the branding.
- * @param {Event} e The input event.
- */
 function updateMainColor(e) {
     mainColor = e.target.value;
     updateBranding();
     saveStateToBrowser();
 }
 
-/**
- * Updates the visibility of the logo and re-renders the branding.
- * @param {Event} e The change event.
- */
 function updateShowLogo(e) {
     showLogo = e.target.checked;
     updateBranding();
     saveStateToBrowser();
 }
 
-/**
- * Updates the logo's position and re-renders the branding.
- * @param {Event} e The change event.
- */
 function updateLogoPosition(e) {
     logoPosition = e.target.value;
     updateBranding();
     saveStateToBrowser();
 }
 
-/**
- * Updates the logo's size and re-renders the branding.
- * @param {Event} e The input event.
- */
 function updateLogoSize(e) {
     logoSize = parseInt(e.target.value) || 80;
     updateBranding();
     saveStateToBrowser();
 }
 
-/**
- * Initializes the game board and switches from the setup screen to the playing screen.
- */
 function startGame() {
-    // Create a new board state with a 'played' flag for each question
     board = gameData.categories.map(category => ({
         ...category,
         questions: category.questions.map(q => ({ ...q, played: false }))
@@ -482,11 +430,16 @@ function startGame() {
     setupScreen.classList.add('hidden');
     playingScreen.classList.remove('hidden');
     renderPlayingScreen();
+
+    // Inform the answer window that the game has started and provide the teams
+    jeopardyChannel.postMessage({
+        type: 'GAME_START',
+        payload: {
+            teams: teams
+        }
+    });
 }
 
-/**
- * Resets the game configuration to its default values.
- */
 function resetToDefaults() {
     teams = [
         { id: 'team-1', name: 'Team A', score: 0 },
@@ -494,11 +447,11 @@ function resetToDefaults() {
     ];
     gameTitle = 'Jeopardy';
     gameTitleInput.value = gameTitle;
-    brandenburgLogoUrl = ""; // CHANGED: Default logo URL is now empty
+    brandenburgLogoUrl = "";
     logoUrlInput.value = brandenburgLogoUrl;
     mainColor = '#ad4d42';
     mainColorInput.value = mainColor;
-    showLogo = false; // CHANGED: Logo is hidden by default
+    showLogo = false;
     showLogoCheckbox.checked = showLogo;
     logoPosition = 'right';
     logoPositionSelect.value = logoPosition;
@@ -506,19 +459,15 @@ function resetToDefaults() {
     logoSizeInput.value = logoSize;
     gameData = JSON.parse(JSON.stringify(initialGameData));
     renderSetupScreen();
-    saveStateToBrowser(); // Save the empty state
+    saveStateToBrowser();
 }
 
-/**
- * Renders the playing screen, including the game board and team scores.
- */
 function renderPlayingScreen() {
     gameBoard.innerHTML = '';
     gameTitleDisplay.textContent = gameTitle;
     gameBoard.style.gridTemplateColumns = `repeat(${gameData.categories.length}, 1fr)`;
 
-    // Render category headers
-    gameData.categories.forEach((category, categoryIndex) => {
+    gameData.categories.forEach((category) => {
         const header = document.createElement('div');
         header.className = 'text-white text-center font-bold text-base md:text-xl p-2 rounded-t-lg border-b-2 border-white min-h-[60px] flex items-center justify-center';
         header.style.backgroundColor = mainColor;
@@ -526,16 +475,13 @@ function renderPlayingScreen() {
         gameBoard.appendChild(header);
     });
 
-    // Determine the maximum number of questions to render the grid correctly
     let maxQuestions = Math.max(0, ...gameData.categories.map(c => c.questions.length));
 
-    // Render question cards for each category
     for (let questionIndex = 0; questionIndex < maxQuestions; questionIndex++) {
         gameData.categories.forEach((category, categoryIndex) => {
             const question = category.questions[questionIndex];
             const card = document.createElement('div');
             if (question) {
-                // Style the card based on whether the question has been played
                 card.className = `flex items-center justify-center p-4 cursor-pointer text-4xl md:text-5xl font-extrabold transition-all duration-300 transform hover:scale-105 rounded-lg ${board[categoryIndex].questions[questionIndex].played ? 'bg-gray-300 text-gray-500 opacity-50 cursor-not-allowed' : 'bg-white border-2 border-gray-300 hover:bg-gray-200'}`;
                 card.style.color = mainColor;
                 card.innerHTML = `<span class="text-2xl font-bold" style="color: ${mainColor};">${question.points}</span>`;
@@ -545,14 +491,12 @@ function renderPlayingScreen() {
                     }
                 });
             } else {
-                // Render an empty card for categories with fewer questions
                 card.className = 'bg-transparent p-4 rounded-lg cursor-not-allowed';
             }
             gameBoard.appendChild(card);
         });
     }
 
-    // Render team scores
     teamScoresContainer.innerHTML = '';
     teams.forEach(team => {
         const teamDiv = document.createElement('div');
@@ -568,11 +512,6 @@ function renderPlayingScreen() {
     updateBranding();
 }
 
-/**
- * Handles a question card click. Displays the question modal.
- * @param {number} categoryIndex The index of the clicked question's category.
- * @param {number} questionIndex The index of the clicked question.
- */
 function handleQuestionClick(categoryIndex, questionIndex) {
     activeQuestion = {
         ...board[categoryIndex].questions[questionIndex],
@@ -584,45 +523,66 @@ function handleQuestionClick(categoryIndex, questionIndex) {
     modalQuestion.textContent = activeQuestion.question;
     modalAnswer.textContent = activeQuestion.answer;
     modalAnswer.style.color = mainColor;
+    // Hide the answer initially in the main modal
     showAnswerContainer.classList.remove('hidden');
     answerContainer.classList.add('hidden');
     modalTeamsButtons.innerHTML = '';
     questionModal.classList.remove('hidden');
-}
 
-/**
- * Reveals the answer in the modal and displays buttons to award points to teams.
- */
-function showAnswer() {
-    showAnswerContainer.classList.add('hidden');
-    answerContainer.classList.remove('hidden');
-    teams.forEach(team => {
-        const button = document.createElement('button');
-        button.className = 'bg-green-600 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 hover:scale-110 hover:bg-green-500 shadow-md';
-        button.textContent = `${team.name}: +${activeQuestion.points} Punkte`;
-        button.addEventListener('click', () => handleScoreUpdate(team.id, activeQuestion.points));
-        modalTeamsButtons.appendChild(button);
+    // Send all info to the answer window
+    jeopardyChannel.postMessage({
+        type: 'SHOW_QUESTION',
+        payload: {
+            answer: activeQuestion.answer,
+            points: activeQuestion.points,
+            teams: teams,
+        }
     });
 }
 
 /**
- * Updates the score of a team and marks the current question as played.
- * @param {string} teamId The ID of the team to update.
- * @param {number} points The points to add to the team's score.
+ * Reveals the answer in the main modal. This is now triggered by the answer window.
+ * It also tells the answer window to switch to the award UI.
  */
-function handleScoreUpdate(teamId, points) {
-    const team = teams.find(t => t.id === teamId);
-    if (team) team.score += points;
-    board[activeQuestion.categoryIndex].questions[activeQuestion.questionIndex].played = true;
-    closeModal();
-    renderPlayingScreen();
-    saveStateToBrowser(); // Save the new score
+function showAnswer() {
+    showAnswerContainer.classList.add('hidden');
+    answerContainer.classList.remove('hidden');
+    // Tell the answer window to switch its UI to the award buttons
+    jeopardyChannel.postMessage({ type: 'SHOW_AWARD_UI' });
 }
 
 /**
- * Closes the question modal and resets the active question state.
+ * Updates a team's score and re-renders the playing screen.
+ * @param {string} teamId The ID of the team to update.
+ * @param {number} points The points to add/subtract.
+ */
+function handleScoreUpdate(teamId, points) {
+    const team = teams.find(t => t.id === teamId);
+    if (team) {
+        team.score += points;
+    }
+    
+    // Mark question as played on the first point interaction
+    if (activeQuestion && !board[activeQuestion.categoryIndex].questions[activeQuestion.questionIndex].played) {
+        board[activeQuestion.categoryIndex].questions[activeQuestion.questionIndex].played = true;
+    }
+    
+    renderPlayingScreen();
+    saveStateToBrowser();
+}
+
+/**
+ * Closes the question modal and tells the answer window to clear itself.
  */
 function closeModal() {
+    if (questionModal.classList.contains('hidden')) return;
+
     questionModal.classList.add('hidden');
     activeQuestion = null;
+
+    jeopardyChannel.postMessage({
+        type: 'CLEAR_ANSWER'
+    });
+    
+    renderPlayingScreen();
 }

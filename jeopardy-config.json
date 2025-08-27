@@ -1,0 +1,176 @@
+{
+  "teams": [
+    {
+      "name": "Team 1"
+    },
+    {
+      "name": "Team 2"
+    },
+    {
+      "name": "Team 3"
+    },
+    {
+      "name": "Team 4"
+    }
+  ],
+  "gameData": {
+    "categories": [
+      {
+        "name": "Ministerien & ihre Aufgaben",
+        "questions": [
+          {
+            "points": 10,
+            "question": "Welches Ministerium ist die oberste Aufsichtsbehörde für die Polizei und den Verfassungsschutz?",
+            "answer": "Das Ministerium des Innern und für Kommunales (MIK)."
+          },
+          {
+            "points": 20,
+            "question": "Welches Ministerium ist sowohl für die Aufstellung des Landeshaushalts als auch für die Beziehungen zur Europäischen Union verantwortlich?",
+            "answer": "Das Ministerium der Finanzen und für Europa (MDFE)."
+          },
+          {
+            "points": 40,
+            "question": "Welches Ministerium bündelt die Zuständigkeiten für Landwirtschaft, Forstwirtschaft und Umweltschutz?",
+            "answer": "Das Ministerium für Land- und Ernährungswirtschaft, Umwelt und Verbraucherschutz (MLEUV)."
+          },
+          {
+            "points": 80,
+            "question": "In welchem Ministerium wurde die strategische Verantwortung für die Digitalisierung der gesamten Landesverwaltung (inklusive des IT-Dienstleisters ZIT-BB) zusammengefasst?",
+            "answer": "Im Ministerium der Justiz und für Digitalisierung (MdJD)."
+          },
+          {
+            "points": 100,
+            "question": "Welches Ministerium beherbergt als institutionelle Besonderheit eine gemeinsame Planungsabteilung, die es sich mit dem Land Berlin teilt?",
+            "answer": "Das Ministerium für Infrastruktur und Landesplanung (MIL)."
+          }
+        ]
+      },
+      {
+        "name": "Digitales Brandenburg (IT-Dienstleister)",
+        "questions": [
+          {
+            "points": 10,
+            "question": "Wie lautet die Abkürzung für den zentralen IT-Dienstleister der allgemeinen Landesverwaltung?",
+            "answer": "ZIT-BB (Brandenburgischer IT-Dienstleister). "
+          },
+          {
+            "points": 20,
+            "question": "Welcher IT-Dienstleister ist speziell für die Gerichte und Staatsanwaltschaften zuständig?",
+            "answer": "Der Zentrale IT-Dienstleister der Justiz (ZenIT). "
+          },
+          {
+            "points": 40,
+            "question": "Welches Bürgerportal, über das man Mängel in der Infrastruktur melden kann, wird technisch vom ZIT-BB betrieben?",
+            "answer": "Maerker. "
+          },
+          {
+            "points": 80,
+            "question": "Was ist das Hauptprojekt und die Kernaufgabe des ZenIT?",
+            "answer": "Die Einführung und der Betrieb der elektronischen Akte (E-Akte). "
+          },
+          {
+            "points": 100,
+            "question": "Welches spezialisierte Finanzamt in Cottbus ist der IT-Dienstleister für die gesamte Steuerverwaltung des Landes?",
+            "answer": "Das Technische Finanzamt (TFA). "
+          }
+        ]
+      },
+      {
+        "name": "Innere Sicherheit (Polizei & Co.)",
+        "questions": [
+          {
+            "points": 10,
+            "question": "Welches Ministerium ist die oberste Aufsichtsbehörde für die Polizei Brandenburg?",
+            "answer": "Das Ministerium des Innern und für Kommunales (MIK). "
+          },
+          {
+            "points": 20,
+            "question": "Wie heißt die zentrale Service- und Logistikeinrichtung der Polizei?",
+            "answer": "Der Zentraldienst der Polizei (ZDPol). "
+          },
+          {
+            "points": 40,
+            "question": "Welche Einrichtung in Oranienburg ist für die Aus- und Fortbildung der Polizeibeamten zuständig?",
+            "answer": "Die Hochschule der Polizei des Landes Brandenburg. "
+          },
+          {
+            "points": 80,
+            "question": "Welche besonders wichtige Aufgabe wird vom ZDPol wahrgenommen, um alte Bomben und Munition zu beseitigen?",
+            "answer": "Der Kampfmittelbeseitigungsdienst (KMBD). "
+          },
+          {
+            "points": 100,
+            "question": "In welcher Stadt befindet sich die Zentrale Bußgeldstelle des Landes, die dem ZDPol angegliedert ist?",
+            "answer": "In Gransee. "
+          }
+        ]
+      },
+      {
+        "name": "Wer macht was? (Zuständigkeiten)",
+        "questions": [
+          {
+            "points": 10,
+            "question": "Welche Behörde ist für die Planung, den Bau und den Betrieb der Bundes- und Landesstraßen zuständig?",
+            "answer": "Der Landesbetrieb Straßenwesen (LS). "
+          },
+          {
+            "points": 20,
+            "question": "Welche Behörde ist für die Bewirtschaftung des Landeswaldes zuständig?",
+            "answer": "Der Landesbetrieb Forst Brandenburg (LFB). "
+          },
+          {
+            "points": 40,
+            "question": "Welches Landesamt ist die zentrale Anlaufstelle für Bürger bei der Feststellung von Schwerbehinderungen?",
+            "answer": "Das Landesamt für Soziales und Versorgung (LASV). "
+          },
+          {
+            "points": 80,
+            "question": "Welche Behörde in Cottbus beaufsichtigt den Bergbau, wie zum Beispiel den Braunkohletagebau?",
+            "answer": "Das Landesamt für Bergbau, Geologie und Rohstoffe (LBGR). "
+          },
+          {
+            "points": 100,
+            "question": "Welche besondere Aufsichtsfunktion hat das Technische Finanzamt (TFA) zusätzlich zu seinen IT-Aufgaben?",
+            "answer": "Die Aufsicht über die in Brandenburg ansässigen Lohnsteuerhilfevereine. "
+          }
+        ]
+      },
+      {
+        "name": "Strukturen & Standorte",
+        "questions": [
+          {
+            "points": 10,
+            "question": "In welcher Stadt befindet sich der Hauptsitz der brandenburgischen Landesregierung?",
+            "answer": "In Potsdam. "
+          },
+          {
+            "points": 20,
+            "question": "Welche zwei zentralen, aber organisatorisch getrennten IT-Dienstleister der Landesverwaltung haben ihren Sitz am selben Standort in Potsdam?",
+            "answer": "Der Brandenburgische IT-Dienstleister (ZIT-BB) und der Zentrale IT-Dienstleister der Justiz (ZenIT). "
+          },
+          {
+            "points": 40,
+            "question": "Welcher Landesbetrieb ist für die Verwaltung und den Bau der landeseigenen Immobilien zuständig?",
+            "answer": "Der Brandenburgische Landesbetrieb für Liegenschaften und Bauen (BLB). "
+          },
+          {
+            "points": 80,
+            "question": "In welcher Stadt hat der Zentraldienst der Polizei (ZDPol) seinen Hauptsitz?",
+            "answer": "In Wünsdorf (Stadt Zossen). "
+          },
+          {
+            "points": 100,
+            "question": "Wie heißt die zentrale Ausbildungsstätte für Feuerwehr und Katastrophenschutz und in welcher Stadt befindet sie sich?",
+            "answer": "Die Landesschule und Technische Einrichtung für Brand- und Katastrophenschutz (LSTE) in Eisenhüttenstadt."
+          }
+        ]
+      }
+    ]
+  },
+  "gameTitle": "Vorstellung der Ministerien",
+  "brandenburgLogoUrl": "",
+  "mainColor": "#ad4d42",
+  "showLogo": false,
+  "logoPosition": "right",
+  "logoSize": 80
+}
